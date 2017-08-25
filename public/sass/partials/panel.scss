@@ -1,0 +1,43 @@
+@import './_variables';
+.panel {
+  min-height: 80vh;
+  background-color: $panel-bg;
+  width: 80%;
+  overflow: hidden;
+  &__info {
+    padding: 0;
+    margin: 0 0 1em 0;
+    &__item {
+      color: $panel-text;
+      list-style: none;
+      padding: .2em 1em;
+      font-family: $panel-font;
+      &--header {
+        height: 44px;
+        background-color: $panel-header-bg;
+        margin-bottom: 1em;
+      }
+      &--mark {
+        color: $col-light-yellow;
+      }
+      &--success {
+        margin-top: 1em;
+        color: $col-light-green;
+        margin-left: 1em;
+      }
+      &--error {
+        color: $col-light-red;
+      }
+      &--message {
+        margin-left: 1em;
+        color: $col-grey;
+      }
+    }
+  }
+}
+
+.file {
+  color: #b1ab7a;
+  margin: .3em;
+  display: inline-block;
+}

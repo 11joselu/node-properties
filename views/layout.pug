@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title= `${title} | ${h.siteName}`
+    //- link(rel="shortcut icon" type="image/png" href="/images/icons/doughnut.png")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet")
+    link(href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/bootflat/2.0.4/css/bootflat.min.css")
+    link(rel='stylesheet', href='/dist/style.css')
+  body
+    block header
+    .content
+      block content
+
+    block scripts
+      script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+      script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js")
+      script(src="/dist/App.bundle.js")
