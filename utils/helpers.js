@@ -6,3 +6,17 @@ exports.dump = obj => JSON.stringify (obj, null, 2);
 
 // Some details about the site
 exports.siteName = `Github Properties editor`;
+
+exports.isInArray = (arr, item) => {
+  return arr.indexOf (item) >= 0;
+};
+
+exports.isInObject = (obj, key) => {
+  return key in obj;
+};
+
+exports.findKeyIntoArrayObject = (arrObj, key) => {
+  return arrObj.some (o => {
+    return this.isInArray (o.keys, key);
+  });
+};

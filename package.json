@@ -22,8 +22,11 @@
     "dotenv": "^4.0.0",
     "es6-promisify": "^5.0.0",
     "express": "^4.15.4",
+    "express-session": "^1.15.5",
     "express-validator": "^3.2.1",
+    "github": "^10.1.0",
     "moment": "^2.18.1",
+    "node-schedule": "^1.2.5",
     "pug": "^2.0.0-rc.3",
     "socket.io": "^2.0.3"
   },

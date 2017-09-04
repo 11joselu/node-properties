@@ -1,12 +1,39 @@
 @import './_variables';
+.panel--hidden {
+  display: none;
+}
+
 .panel {
-  min-height: 80vh;
+  animation: scale .8s ease-in;
+  min-height: 380px;
   background-color: $panel-bg;
-  width: 80%;
-  overflow: hidden;
+  width: 60%;
+  margin: 0 auto;
+  box-shadow: $shadow;
+  position: relative;
+  top: -42px;
   &__info {
     padding: 0;
     margin: 0 0 1em 0;
+    &__worker {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      color: $col-bg;
+      .loading {
+        padding-left: 0;
+        text-align: center;
+      }
+      &__click {
+        font-size: 1.5rem;
+        color: $col-light-green;
+        text-align: center;
+        cursor: pointer;
+        display: inherit;
+      }
+    }
     &__item {
       color: $panel-text;
       list-style: none;
@@ -16,28 +43,33 @@
         height: 44px;
         background-color: $panel-header-bg;
         margin-bottom: 1em;
+        border-bottom: 1px solid $col-bg;
       }
       &--mark {
-        color: $col-light-yellow;
+        color: $col-light-green;
+        font-weight: bold;
+        position: relative;
+        margin: 2em 0;
       }
       &--success {
         margin-top: 1em;
-        color: $col-light-green;
+        color: $col-green;
         margin-left: 1em;
       }
       &--error {
         color: $col-light-red;
       }
       &--message {
-        margin-left: 1em;
+        margin: .3em 1em;
         color: $col-grey;
+        border: 1px solid #edf0f5;
       }
     }
   }
 }
 
 .file {
-  color: #b1ab7a;
+  color: $panel-file;
   margin: .3em;
   display: inline-block;
 }

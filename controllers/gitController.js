@@ -2,35 +2,9 @@ const {join} = require ('path');
 const util = require ('../utils/util-functions');
 const {emitEvent} = require ('../handlers/ioHandlers');
 const {mkdtempSync} = require ('fs');
+const {TMP_PREFIX} = require('../utils/constants');
 let tmpFolder;
 let output_path;
-/**
- * Execute and emit git tasks
- *  return response task
- */
-const executeGitTask = async (req, res, command, message = '') => {
-  let commandResult = {};
-  emitEvent (req, res, `cmd task`, message || command);
-  // Execute task and wait for a response
-  commandResult = await util.executeCommand (command, {cwd: output_path});
-  // Emit response
-  emitEvent (
-    req,
-    res,
-    `cmd message`,
-    commandResult.stderr || commandResult.stdout
-  );
-  return commandResult;
-};
-
-const createBrMessage = message => {
-  return `<br /><br /> ${message}`;
-};
-
-//Remove __dirname from path
-const getWorkingPath = path => {
-  return path.substring (path.indexOf (tmpFolder));
-};
 
 /**
  * Reall all files and generate array of content files
@@ -47,7 +21,7 @@ const getDataFromArrayOfFiles = async (filesDir, files, req, res) => {
         req,
         res,
         `cmd message`,
-        `Reading file ${getWorkingPath (filePath)}`
+        `Reading file ${util.getWorkingPath (filePath, tmpFolder)}`
       );
 
       // load content data
@@ -60,13 +34,17 @@ const getDataFromArrayOfFiles = async (filesDir, files, req, res) => {
     })
   );
 
-  emitEvent (req, res, `cmd end`, '<strong>Successfully</strong> loaded');
+  if (data.length !== 0) {
+    emitEvent (req, res, `cmd end`, '<strong>Successfully</strong> loaded');
+  }
+
   return data;
 };
 
 const readPropertiesFiles = async (req, res) => {
+  const paths = process.env.SOURCE_PATH.split('-');
   // Path for properties files
-  const filesDir = join (output_path, 'src', 'main', 'resources');
+  const filesDir = join (output_path, ...paths);
   // Get all files (skip directories)
   const files = await util.getPropertiesFromDirectory (filesDir);
 
@@ -74,22 +52,22 @@ const readPropertiesFiles = async (req, res) => {
     req,
     res,
     `cmd pending`,
-    createBrMessage (
-      `Reading properties files from ${getWorkingPath (filesDir)}`
-    )
+    `Reading properties files from ${util.getWorkingPath (filesDir, tmpFolder)}`
   );
 
   // Create list of html files
-  const filesHTML = files
-    .map (x => `<br /> <span class="file">${x}</span>`)
-    .join ('');
+  const filesHTML = files.map (x => `<br /> <span class="file">${x}</span>`);
 
-  emitEvent (
-    req,
-    res,
-    `cmd message`,
-    `List of <strong>Files found:</strong> ${filesHTML}`
-  );
+  if (filesHTML.length === 0) {
+    emitEvent (req, res, `cmd error`, 'No files found');
+  } else {
+    emitEvent (
+      req,
+      res,
+      `cmd message`,
+      `List of <strong>Files found:</strong> ${filesHTML.join ('')}`
+    );
+  }
 
   return await getDataFromArrayOfFiles (filesDir, files, req, res);
 };
@@ -98,23 +76,28 @@ const readPropertiesFiles = async (req, res) => {
  * Clone repository into ./tmp/
  */
 exports.gitClone = async (req, res, next) => {
-  // create a temporal folder
-  tmpFolder = mkdtempSync (process.env.TMP_PREFIX);
-  // create output path
-  output_path = join (__dirname, '..', '.tmp', tmpFolder);
-  const url = process.env.GIT_URL;
-  // clean output path
-  emitEvent (req, res, `cmd start`, `rm -rf ${tmpFolder}`);
-  await util.executeCommand (`rm -rf ${tmpFolder}`);
-  // clone repository into output path
-  emitEvent (
-    req,
-    res,
-    `cmd task`,
-    `git clone ${url} <strong>into ${tmpFolder}/</strong>`
-  );
-  await util.executeCommand (`git clone ${url} ${output_path}`);
-  next ();
+  try {
+    // create a temporal folder
+    tmpFolder = mkdtempSync (TMP_PREFIX);
+    // create output path
+    output_path = join (__dirname, '..', '.tmp', tmpFolder);
+    const url = process.env.GIT_URL;
+    // clean output path
+    emitEvent (req, res, `cmd start`, `rm -rf ${tmpFolder}`);
+    await util.executeCommand (`rm -rf ${tmpFolder}`);
+    // clone repository into output path
+    emitEvent (
+      req,
+      res,
+      `cmd task`,
+      `git clone ${url} <strong>into ${tmpFolder}/</strong>`
+    );
+    await util.executeCommand (`git clone ${url} ${output_path}`);
+    next ();
+  } catch (e) {
+    emitEvent (req, res, `cmd error`, `Error cloning...`);
+    util.errorResponse (req, res);
+  }
 };
 
 /**
@@ -122,55 +105,88 @@ exports.gitClone = async (req, res, next) => {
  *  and fetch all tags
  */
 exports.gitFetchTags = async (req, res, next) => {
-  // load last version tag
-  let command = `git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1`;
-  let commandResult = await executeGitTask (req, res, command);
-  const tagName = commandResult.stdout.toString ().replace ('\n', '');
-  // Checkout into version branch
-  command = `git checkout ${tagName}`;
-  await executeGitTask (req, res, command);
-  req.tagName = tagName;
-  // check branch
-  command = `git status`;
-  await executeGitTask (req, res, command);
+  try {
+    // load last version tag
+    let command = `git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1`;
+    let commandResult = await util.executeGitTask (
+      req,
+      res,
+      output_path,
+      command
+    );
 
-  next ();
+    const tagName = commandResult.stdout.toString ().replace ('\n', '');
+
+    if (!tagName) {
+      return res.render ('error', {message: 'No tag found'});
+    }
+    
+    // Checkout into version branch
+    command = `git checkout ${tagName}`;
+    await util.executeGitTask (req, res, output_path, command);
+    req.session.tagName = tagName;
+    // check branch
+    command = `git status`;
+    await util.executeGitTask (req, res, output_path, command);
+
+    next ();
+  } catch (e) {
+    emitEvent (req, res, `cmd error`, `Error doing checkout to tag ...`);
+    util.errorResponse (req, res);
+  }
 };
 
 /**
  * Read all properties files into a directory
  */
 exports.readPropertiesFiles = async (req, res, next) => {
-  req.tag = await readPropertiesFiles (req, res);
-  next ();
+  try {
+    req.session.tag = await readPropertiesFiles (req, res);
+    next ();
+  } catch (e) {
+    emitEvent (req, res, `cmd error`, `Error reading properties files ...`);
+    util.errorResponse (req, res);
+  }
 };
 
 exports.changeToMaster = async (req, res, next) => {
-  emitEvent (req, res, `cmd pending`, createBrMessage (`Change to master`));
-  // Checkout to master branch
-  let command = `git checkout test-properties`;
-  await executeGitTask (req, res, command);
-  // Show current branch
-  command = `git branch`;
-  await executeGitTask (req, res, command);
+  try {
+    emitEvent (req, res, `cmd pending`, `Change to master`);
+    // Checkout to master branch
+    let command = `git checkout master`;
+    await util.executeGitTask (req, res, output_path, command);
+    // Show current branch
+    command = `git branch`;
+    await util.executeGitTask (req, res, output_path, command);
 
-  // Pull changes
-  command = `git pull`;
-  await executeGitTask (req, res, command);
-  next ();
+    // Pull changes
+    command = `git pull`;
+    await util.executeGitTask (req, res, output_path, command);
+    next ();
+  } catch (e) {
+    emitEvent (req, res, `cmd error`, `Error doing checkout to master ...`);
+    util.errorResponse (req, res);
+  }
 };
 
 exports.readPropertiesFilesFromMaster = async (req, res, next) => {
-  req.master = await readPropertiesFiles (req, res);
-  next ();
+  try {
+    const master = await readPropertiesFiles (req, res);
+    req.session.master = master;
+    next ();
+  } catch (e) {
+    emitEvent (req, res, `cmd error`, `Error reading master properties files ...`);
+    util.errorResponse (req, res);
+  }
 };
 
 exports.gitCloneResponse = async (req, res, next) => {
-  // clean output path and codes
-  await util.executeCommand (`rm -rf ${output_path}`);
-  emitEvent (req, res, `cmd end`, '<strong>Worker tasks ended</strong>');
-  const id = tmpFolder.split (process.env.TMP_PREFIX).filter (x => x).join ('');
-
+  if (req.session.tag.length === 0 && req.session.master.length === 0) {
+    return util.errorResponse (req, res, 'Worker tasks ended');
+  }
+  emitEvent (req, res, `cmd end`, 'Worker tasks ended');
+  const id = tmpFolder.split (TMP_PREFIX).filter (x => x).join ('');
+  req.session.tmpFolder = tmpFolder;
   res.json ({
     status: 200,
     data: {

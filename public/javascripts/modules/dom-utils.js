@@ -14,7 +14,7 @@ export const createLoadingComponent = () => {
   </div>`;
 };
 
-export const createLink = (href, text, strClasses) => {
+export const createLink = (href, text, strClasses = 'button success') => {
   return `
     <a href="${href}" class="${strClasses}">${text}</a>
   `;

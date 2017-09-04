@@ -1,0 +1,79 @@
+@import './_variables';
+.edit {
+  background: $panel-bg;
+  width: 90%;
+  margin: 0 auto;
+  position: relative;
+  top: -14px;
+  box-shadow: $shadow;
+  padding-bottom: 1em;
+  padding-top: 3em;
+  margin-bottom: 1em;
+
+  p {
+    color: darken($col-bg, 20%);
+  }
+
+  textarea {
+    resize: none;
+    &:empty {
+      background-color: #f7ffd7;      
+    }
+  }
+  
+  &__button {
+    margin: 0 auto;
+    display: inherit;
+    width: 100%;
+    margin-bottom: 1em;
+    background-color: $col-pink !important;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 110px;
+    right: 20px;
+    margin-right: 5em;
+    z-index: 999;
+  }
+  &__panel {
+    margin: .4em 0;
+    width: 100%;
+    max-width: 100%;
+    border-bottom: 1px solid lighten($col-bg, 20%);
+    &__index {
+      padding: 0 .4em;
+    }
+    &.edit__panel--new {
+      background-color: lighten($col-bg, 28%);
+    }
+    &__key {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    &__status {
+      background: transparent;
+      padding: .2em .5em;
+      border-radius: 4px;
+      opacity: 0;
+      font-size: .8em;
+      &.edit__panel__status--new {
+        opacity: 1;
+        background: $col-green-support;
+        color: $panel-bg;
+      }
+    }
+    &__filename {
+      padding: 0 .4em;
+    }
+  }
+}
+
+.edit--error--message {
+  text-align: center;
+  text-decoration: none;
+  list-style: none;
+  font-size: 40px;
+  color: $col-light-red;
+  font-weight: bold;
+  padding-top: 2em;
+}

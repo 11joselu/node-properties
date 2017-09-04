@@ -1,13 +1,19 @@
-$col-light-yellow: #ffff91;
-$col-light-green: #B1FD79;
-$col-light-red: #FF9B93;
-$col-grey: #afafab;
+$col-light-green: #25daa5;
+$col-green: #0ea95d;
+$col-green-support: #01b06b;
+$col-light-red: #f6726f;
+$col-grey: #a9a9a9;
+$col-pink: #f6726f;
 // Panel
-$panel-bg: #222;
-$panel-header-bg: #444;
-$panel-text: #f1f1f1;
+$panel-bg: #fff;
+$panel-header-bg:$panel-bg;
+$panel-text: #5b5b5b;
+$panel-file: #8b939e;
 $panel-font: 'Inconsolata',
 monospace;
 // loading
 $offset: 187;
 $duration: 1.4s;
+$col-bg:#656dce;
+$col-text: $panel-bg;
+$shadow: 2px 2px 10px -1px rgba(0, 0, 0, 0.2);

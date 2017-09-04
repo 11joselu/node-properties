@@ -1,2 +1,121 @@
 @import 'partials/panel';
 @import 'partials/loading';
+@import 'partials/home';
+@import 'partials/_variables.scss';
+@import 'partials/edit';
+@import 'partials/login';
+html {
+  height: 100%;
+}
+
+html,
+body {
+  width: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  color: $col-text;
+  font-family: 'Roboto', sans-serif;
+  background-color: $col-bg;
+  position: relative;
+  margin: 0;
+  padding-bottom: 2rem;
+  min-height: 100%;
+  height: auto;
+  background: $col-bg;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  /* Set your content font stack here: */
+  font-weight: bold;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  padding: .5em;
+  a {
+    font-weight: bold;
+    color: $col-text;
+  }
+}
+
+.content {
+  height: 100%;
+  width: 100%;
+}
+
+.button.success {
+  background-color: $col-pink;
+  color: $panel-bg;
+  &:hover {
+    background-color: darken($col-pink, 5%);
+    color: $panel-bg;
+  }
+}
+
+.button.primary {
+  background-color: $col-bg;
+  color: $panel-bg;
+  &:hover {
+    background-color: darken($col-bg, 5%);
+    color: $panel-bg;
+  }
+}
+
+.message--eror {
+  background-color: $col-pink;
+  color: $panel-bg;
+  border-radius: 5px;
+  border: 1px solid $col-pink;
+  padding: .4em;
+}
+
+input {
+  border-radius: 5px !important;
+}
+
+.header {
+  margin: 0;
+  .header--logout {
+    color: $panel-bg;
+    display: inline-block;
+    padding: 1em;
+  }
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: space-between;
+  @media screen and (max-width: 750px) {
+    flex-direction: column;
+  }
+}
+
+.body__background {
+  background: darken($col-bg, 4%);
+}

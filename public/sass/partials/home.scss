@@ -1,0 +1,31 @@
+@import './_variables';
+.home {
+  &__title {
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 5em;
+    color: $panel-bg;
+    padding: 1em;
+    font-weight: normal;
+    font-family: Roboto, Arial, sans-serif;
+    letter-spacing: 5.2px;
+  }
+  &__button {
+    margin: 0 auto;
+    display: inherit;
+    background-color: transparent !important;
+    color: $col-light-green !important;
+    font-weight: bold;
+    font-size: 1.4rem;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.buttons {
+  position: fixed;
+  bottom: 37px;
+  right: 20px;
+}

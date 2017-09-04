@@ -1,4 +1,34 @@
 extends layout
 
+block header
+  p.header.text-right
+    a.header--logout(href="/logout") Log out
 block content
-  h1 Edit page
+  h2.home__title.animate
+      | Edit Properties 
+  .panel.panel--hidden#panel.animate
+    div.panel__info__item.panel__info__item--header
+    ul.panel__info#panel__info
+  form.animate.edit#edit__form(method="POST"  encrypt="multipart/form-data")
+    input(type="submit" value="Save" class="button primary edit__button")
+    each key, index in masterKeys
+      section.edit__panel.row(class= h.findKeyIntoArrayObject(tagKeys, key)? '': 'edit__panel--new')
+        article.small-12.large-4.columns
+          p &nbsp;
+          p
+            if h.findKeyIntoArrayObject(tagKeys, key)
+              span.edit__panel__status New
+            else
+              span.edit__panel__status.edit__panel__status--new New
+            span.edit__panel__index= index + 1
+            span.edit__panel__key= key
+        div
+          each m in master
+            .small-12.large-3.columns(class= h.isInArray(tagFiles, m.fileName)? '' : 'edit__panel--new__file')
+              p
+                if h.isInArray(tagFiles, m.fileName)
+                  span.edit__panel__status New
+                else
+                  span.edit__panel__status.edit__panel__status--new New
+                span.edit__panel__filename= m.fileName
+              textarea.edit__panel__filevalue(name=m.fileName + '__' + key)= m.content[key]
