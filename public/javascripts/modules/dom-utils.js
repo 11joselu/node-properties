@@ -1,5 +1,5 @@
 export const createItem = (x, strClasses = 'panel__info__item') => {
-  return `<li class="${strClasses}">${x}</li>`;
+  return `<li class="${strClasses}"><pre>${x}</pre></li>`;
 };
 
 export const removeLoading = (klass = '.loading') => {
