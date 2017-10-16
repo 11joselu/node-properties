@@ -26,7 +26,6 @@
     "express-validator": "^3.2.1",
     "github": "^10.1.0",
     "moment": "^2.18.1",
-    "node-schedule": "^1.2.5",
     "pug": "^2.0.0-rc.3",
     "socket.io": "^2.0.3"
   },

@@ -68,19 +68,21 @@ h6 {
 
 .button.success {
   background-color: $col-pink;
-  color: $panel-bg;
+  color: $col-bg;
+  font-weight: bold;
   &:hover {
     background-color: darken($col-pink, 5%);
-    color: $panel-bg;
+    color: $col-bg;
   }
 }
 
 .button.primary {
   background-color: $col-bg;
-  color: $panel-bg;
+  color: $col-bg;
+  font-weight: bold;
   &:hover {
     background-color: darken($col-bg, 5%);
-    color: $panel-bg;
+    color: $col-bg;
   }
 }
 

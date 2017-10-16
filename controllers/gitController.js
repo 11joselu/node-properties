@@ -72,18 +72,9 @@ const readPropertiesFiles = async (req, res) => {
   return await getDataFromArrayOfFiles (filesDir, files, req, res);
 };
 
-/**
- * Clone repository into ./tmp/
- */
-exports.gitClone = async (req, res, next) => {
+const cloneRepo = async(req, res, next) => {
   try {
-    // create a temporal folder
-    tmpFolder = mkdtempSync (TMP_PREFIX);
-    // create output path
-    output_path = join (__dirname, '..', '.tmp', tmpFolder);
     const url = process.env.GIT_URL;
-    // clean output path
-    emitEvent (req, res, `cmd start`, `rm -rf ${tmpFolder}`);
     await util.executeCommand (`rm -rf ${tmpFolder}`);
     // clone repository into output path
     emitEvent (
@@ -98,6 +89,23 @@ exports.gitClone = async (req, res, next) => {
     emitEvent (req, res, `cmd error`, `Error cloning...`);
     util.errorResponse (req, res);
   }
+ 
+}
+
+/**
+ * Clone repository into ./tmp/
+ */
+exports.gitClone = async (req, res, next) => {
+  tmpFolder = 'openppm';
+  output_path = join (__dirname, '..', '.tmp', tmpFolder);
+  try {
+    const dirs = util.readDir(output_path);
+    emitEvent (req, res, `cmd start`, `Starting...`);
+    next();
+  } catch (e) {
+    emitEvent (req, res, `cmd start`, `Starting...`);
+    await cloneRepo(req, res, next)
+  }
 };
 
 /**
@@ -107,7 +115,7 @@ exports.gitClone = async (req, res, next) => {
 exports.gitFetchTags = async (req, res, next) => {
   try {
     // load last version tag
-    let command = `git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1`;
+    let command = `git for-each-ref refs/tags/V-* --sort=-taggerdate --format='%(refname)' --count=1`;
     let commandResult = await util.executeGitTask (
       req,
       res,
@@ -122,7 +130,7 @@ exports.gitFetchTags = async (req, res, next) => {
     }
     
     // Checkout into version branch
-    command = `git checkout ${tagName}`;
+    command = `git checkout ${tagName} -f`;
     await util.executeGitTask (req, res, output_path, command);
     req.session.tagName = tagName;
     // check branch
@@ -151,9 +159,9 @@ exports.readPropertiesFiles = async (req, res, next) => {
 
 exports.changeToMaster = async (req, res, next) => {
   try {
-    emitEvent (req, res, `cmd pending`, `Change to master`);
+    emitEvent (req, res, `cmd pending`, `Change to develop`);
     // Checkout to master branch
-    let command = `git checkout master`;
+    let command = `git checkout -B develop origin/develop`;
     await util.executeGitTask (req, res, output_path, command);
     // Show current branch
     command = `git branch`;
