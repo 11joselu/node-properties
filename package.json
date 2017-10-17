@@ -11,7 +11,10 @@
     "dev": "concurrently \"npm run watch\" \"npm run assets\" --names \"bl\" --prefix name",
     "watch": "browser-refresh ./start.js",
     "assets": "webpack -w --display-max-modules 0",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --display-max-modules 0",
+    "prestart": "npm run build",
+    "start": "pm2 start start.js"
   },
   "author": "Jose Cabrera <joselu11cabrera@gmail.com>",
   "license": "ISC",
