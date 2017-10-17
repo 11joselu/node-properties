@@ -1,0 +1,28 @@
+$ var error = data.error;
+
+<include('./layout.marko')>
+  <@title>
+    ${data.title} | ${out.global.h.siteName}
+  </@title>
+  <@body>
+    <article class="login flex">
+      <div class="small-12 large-6 columns login__logo"><a href="/"><img src="./images/logo_miniTalaia.png" alt=""/></a>
+        <p class="text-center login__logo__welcome login__logo__welcome--title">Welcome</p>
+        <p class="text-center login__logo__welcome">node properties editor</p>
+      </div>
+      <div class="large-6 columns body__background">
+        <form class="login__form" action="/login" method="POST">
+          <p>Log in</p>
+          <if (error)>
+            <p class="text-center message--error">${error}</p>
+          </if>
+          <input type="text" placeholder="Username" name="username"/>
+          <input type="password" placeholder="Password" name="password"/>
+          <p class="text-right">
+            <input class="button expanded primary button--login" type="submit" value="Enter"/>
+          </p>
+        </form>
+      </div>
+    </article>
+  </@body>
+</include>

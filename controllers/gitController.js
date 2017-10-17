@@ -3,6 +3,8 @@ const util = require ('../utils/util-functions');
 const {emitEvent} = require ('../handlers/ioHandlers');
 const {mkdtempSync} = require ('fs');
 const {TMP_PREFIX} = require('../utils/constants');
+const errorTemplate = require('../views/error.marko');
+
 let tmpFolder;
 let output_path;
 
@@ -126,7 +128,7 @@ exports.gitFetchTags = async (req, res, next) => {
     const tagName = commandResult.stdout.toString ().replace ('\n', '');
 
     if (!tagName) {
-      return res.render ('error', {message: 'No tag found'});
+      return res.marko (errorTemplate, {message: 'No tag found'});
     }
     
     // Checkout into version branch

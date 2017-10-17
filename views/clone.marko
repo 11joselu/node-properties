@@ -1,0 +1,26 @@
+<include('./layout.marko')>
+  <@title>
+    ${data.title} | ${out.global.h.siteName}
+  </@title>
+  <@header>
+   <p class="header text-right">
+      <a class="header--logout" href="/logout">Log out</a>
+    </p>
+  </@header>
+  <@body>
+    <h2 class="home__title animate">Node Properties </h2>
+    <div class="panel" id="panel">
+      <div class="panel__info__item panel__info__item--header"></div>
+      <div class="panel__info__worker"> 
+        <p>Worker is waiting...</p><a class="panel__info__worker__click" id="button-load">Click to load data</a>
+        <div class="loading">
+          <svg class="loading__spinner" width="30px" height="30px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+            <circle class="loading__spinner__path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </div>
+      <ul class="panel__info" id="panel__info"></ul>
+      <div class="buttons" id="buttons"></div>
+    </div>
+  </@body>
+</include>

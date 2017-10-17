@@ -1,0 +1,66 @@
+$ var masterKeys = data.masterKeys;
+$ var master = data.master;
+$ var tagFiles = data.tagFiles;
+
+<include('./layout.marko')>
+  <@title>
+    ${data.title} | ${out.global.h.siteName}
+  </@title>
+  <@header>
+   <p class="header text-right">
+      <a class="header--logout" href="/logout">Log out</a>
+    </p>
+  </@header>
+  <@body>
+    <h2 class="home__title animate">Edit Properties</h2>
+    <div class="panel panel--hidden animate" id="panel">
+      <div class="panel__info__item panel__info__item--header"></div>
+      <ul class="panel__info" id="panel__info"></ul>
+    </div>
+    
+    <div class="loading text-center" id="loading--edit">
+      <svg class="loading__spinner" width="15px" height="15px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+        <circle class="loading__spinner__path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+      </svg>
+
+      Loading Data
+    </div>
+
+    <form class="animate edit panel--hidden" id="edit__form">
+      <input class="button primary edit__button" type="submit" value="Save"/>
+      <for(index, key in masterKeys)>
+        <section class="edit__panel row ${out.global.h.findKeyIntoArrayObject(data.tagKeys, key)? '': 'edit__panel--new'}">
+          <article class="small-12 large-4 columns">
+            <p>&nbsp;</p>
+            <p>
+              <if(out.global.h.findKeyIntoArrayObject(data.tagKeys, key))>
+                <span class="edit__panel__status">New</span>
+              </if>
+              <else>
+                <span class="edit__panel__status edit__panel__status--new">New</span>
+              </else>
+              <span class="edit__panel__index">${index + 1}</span>
+              <span class="edit__panel__key">${key}</span>
+            </p>
+          </article>
+          <div>
+            <for(m in master)>
+              <div class="small-12 large-3 columns ${out.global.h.isInArray(tagFiles, m.fileName)? '' : 'edit__panel--new__file'}">
+                <p>
+                  <if (out.global.h.isInArray(tagFiles, m.fileName))>
+                    <span class="edit__panel__status">New</span>
+                  </if>
+                  <else>
+                    <span class="edit__panel__status edit__panel__status--new New">New</span>
+                  </else>
+                  <span>${m.fileName}</span>
+                </p>
+                <textarea class="edit__panel__filevalue" name="${m.fileName + '__' + key}">${m.content[key]}</textarea>
+              </div>
+            </for>
+          </div>
+        </section>
+      </for>
+    </form>
+  </@body>
+</include>

@@ -5,6 +5,7 @@ import {
   createLoadingComponent,
   createLink,
 } from './modules/dom-utils';
+import * as axios from 'axios';
 
 $ (document).ready (() => {
   let numberErrors = 0;
@@ -83,15 +84,19 @@ $ (document).ready (() => {
       });
   });
 
+  $('#edit__form').removeClass('panel--hidden');
+  $('#loading--edit').remove();
+  
   $ ('#edit__form').on ('submit', function (evt) {
     evt.preventDefault ();
     $ (this).hide ();
+    const data = {};
 
-    $.ajax ({
-      type: 'POST',
-      url: '/edit/values',
-      data: $(this).serialize(),
-    })
+    $(this).serializeArray().forEach(function(x){
+      data[x.name] = x.value;
+    });
+
+    axios.post('/edit/values', data)
     .then(() => {
       numberErrors = 0;
     })

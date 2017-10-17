@@ -6,6 +6,8 @@ const util = require ('../utils/util-functions');
 const {emitEvent} = require ('../handlers/ioHandlers');
 const moment = require ('moment');
 const Github = require ('github');
+const editTemplate = require('../views/edit.marko');
+
 const github = new Github ({
   host: process.env.GITHUB_HOST,
   pathPrefix: '/api/v3',
@@ -42,7 +44,7 @@ exports.getTemplate = (req, res, next) => {
 
   masterKeys = uniq (masterKeys);
 
-  return res.render ('edit', {
+  return res.marko (editTemplate, {
     title: 'Edit',
     tagKeys,
     tagFiles,
@@ -54,6 +56,7 @@ exports.getTemplate = (req, res, next) => {
 exports.generateFiles = async (req, res, next) => {
   try {
     const properties = req.body;
+    console.log(properties);
     const {id} = req.params;
     const {tmpFolder} = req.session;
     const output_path = join (__dirname, '..', '.tmp', tmpFolder);

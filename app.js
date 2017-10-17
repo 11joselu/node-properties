@@ -1,9 +1,12 @@
+require('marko/node-require').install(); // Allow Node.js to require and load `.marko` files
+
 const express = require ('express');
 const path = require ('path');
 const bodyParser = require ('body-parser');
 const promisify = require ('es6-promisify');
 const expressValidator = require ('express-validator');
 const session = require ('express-session');
+const markoExpress = require('marko/express');
 
 const home = require ('./routes/home');
 const edit = require ('./routes/edit');
@@ -18,15 +21,12 @@ const errorHandlers = require ('./handlers/errorHandlers');
 const loginHanderls = require ('./handlers/loginHandler');
 
 // view engine setup
-app.set ('views', path.join (__dirname, 'views')); // this is the folder where we keep our pug files
-app.set ('view engine', 'pug'); // we use the engine pug, mustache or EJS work great too
+app.use(markoExpress()); //enable res.marko(template, data)
 
 // serves up static files from the public folder. Anything in public/ will just be served up as the file it is
 app.use (express.static (path.join (__dirname, 'public')));
 
-// Takes the raw requests and turns them into usable properties on req.body
-app.use (bodyParser.json ());
-app.use (bodyParser.urlencoded ({extended: true}));
+
 
 // Exposes a bunch of methods for validating data. Used heavily on userController.validateRegister
 app.use (expressValidator ());
@@ -39,6 +39,10 @@ app.use (
     saveUninitialized: false, // don't create session until something stored
   })
 );
+
+// Takes the raw requests and turns them into usable properties on req.body
+app.use (bodyParser.json ({limit:1024102420, type:'application/json'}));
+app.use (bodyParser.urlencoded ({extended: true, limit: '50mb'}));
 
 // pass variables to our templates + all requests
 app.use ((req, res, next) => {

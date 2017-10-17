@@ -2,3 +2,4 @@
 /public/dist/
 .tmp/
 enviroment.env
+*.marko.js

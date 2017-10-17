@@ -1,0 +1,14 @@
+<include('./layout.marko')>
+  <@title>
+    ${data.title}
+  </@title>
+  <@body>
+    <div class="inner">
+      <h2>${data.status}</h2>
+      <p>${data.message}</p>
+    </div>
+    <pre>
+      !${data.stackHighlighted}
+    </pre>
+  </@body>
+</include>

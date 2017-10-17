@@ -3,9 +3,10 @@ const router = express.Router ();
 const {catchErrors} = require ('../handlers/errorHandlers');
 const gitController = require ('../controllers/gitController');
 const loginController = require ('../controllers/loginController');
+const homeTemplate = require('../views/clone.marko');
 
 router.get ('/', (req, res) => {
-  res.render ('clone', {
+  res.marko (homeTemplate, {
     title: 'Start',
   });
 });

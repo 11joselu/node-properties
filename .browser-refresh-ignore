@@ -1,0 +1,6 @@
+*.marko.js
+/node_modules
+.*
+/build
+ public/
+ .tmp/

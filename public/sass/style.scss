@@ -86,11 +86,11 @@ h6 {
   }
 }
 
-.message--eror {
-  background-color: $col-pink;
+.message--error {
+  background-color: $col-light-red;
   color: $panel-bg;
   border-radius: 5px;
-  border: 1px solid $col-pink;
+  border: 1px solid $col-light-red;
   padding: .4em;
 }
 
@@ -120,4 +120,8 @@ input {
 
 .body__background {
   background: darken($col-bg, 4%);
+}
+
+input[type="submit"].button--login {
+  color: $col-pink !important;
 }

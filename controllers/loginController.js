@@ -1,8 +1,11 @@
+const template = require('../views/login.marko');
+
 exports.getTemplate = (req, res, next) => {
   if (req.session.authenticated) {
     return res.redirect ('/');
   }
-  res.render ('login', {title: 'Log in'});
+  
+  res.marko (template, {title: 'Log in'});
 };
 
 exports.login = (req, res, next) => {
@@ -14,7 +17,7 @@ exports.login = (req, res, next) => {
     req.session.authenticated = true;
     res.redirect ('/');
   } else {
-    res.render ('login', {
+    res.marko (template, {
       title: 'Log in',
       error: 'Incorrect username or password',
     });

@@ -12,4 +12,8 @@ app.set ('port', process.env.PORT || 7777);
 
 server.listen (app.get ('port'), () => {
   console.log (`Express running → PORT ${server.address ().port}`);
+
+  if (process.send) {
+    process.send('online');
+  }
 });
