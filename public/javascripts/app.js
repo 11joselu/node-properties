@@ -17,7 +17,7 @@ $ (document).ready (() => {
   
     if (num >= 2) {
       $('#js-users').addClass('message--error');
-      $('#js--message').text('Too much users connected, could break yours changes. ' + pageData.userID)
+      $('#js--message').text('Too much users connected, could break yours changes.')
         .addClass('message--error');
       
       if (userID === pageData.userID) {
@@ -26,7 +26,7 @@ $ (document).ready (() => {
   
     } else {
       $('#js-users').removeClass('message--error');
-      $('#js--message').text('users connected ' + pageData.userID)
+      $('#js--message').text('users connected')
         .removeClass('message--error');
       showButtons();
     }
@@ -121,9 +121,14 @@ $ (document).ready (() => {
           $(item).addClass('hidden');
         }
       });
+
+      if ($('.edit__panel--new').length === 0) {
+        $('#not-found').removeClass('hidden');
+      }
     } else {
       $('.edit__panel').each((index, item) => {
         $(item).removeClass('hidden');
+        $('#not-found').addClass('hidden');
       });
     }
 
@@ -153,6 +158,7 @@ $ (document).ready (() => {
   
   $ ('#edit__form').on ('submit', function (evt) {
     evt.preventDefault ();
+    $('#js-checkbox').hide();    
     $ (this).hide ();
     const data = {};
 
@@ -175,8 +181,9 @@ $ (document).ready (() => {
         $panelInfo.append('<li class="edit--error--message">Something went wrong. Contact to the administrator</li>')
       }
 
-      $panelInfo.append(`<li class="edit--error--message">${e.response.data.message}</li>`);
+      $panelInfo.append(`<li class="edit--error--message text--suport">${e.response.data.message}</li>`);
       $ (this).show ();
+      $('#js-checkbox').show();
     })
   });
 });

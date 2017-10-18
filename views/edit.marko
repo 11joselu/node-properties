@@ -1,6 +1,7 @@
 $ var masterKeys = data.masterKeys;
 $ var master = data.master;
 $ var tagFiles = data.tagFiles;
+$ var printed = false;
 
 <include('./layout.marko')>
   <@title>
@@ -40,7 +41,10 @@ $ var tagFiles = data.tagFiles;
     <form class="animate edit panel--hidden" id="edit__form">
       <input class="button primary edit__button" type="submit" value="Save"/>
       <for(index, key in masterKeys)>
-        
+        <if (out.global.h.findKeyIntoArrayObject(data.tagKeys, key) && !printed && index === masterKeys.length - 1)>
+          <p class="text-center" id="not-found">No new attributes found</p>
+          $ printed = true;
+        </if>
         <section class="edit__panel row ${out.global.h.findKeyIntoArrayObject(data.tagKeys, key)? 'hidden': 'edit__panel--new'}">
           <article class="small-12 large-4 columns">
             <p>&nbsp;</p>
