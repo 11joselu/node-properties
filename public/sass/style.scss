@@ -1,9 +1,11 @@
 @import 'partials/panel';
 @import 'partials/loading';
 @import 'partials/home';
-@import 'partials/_variables.scss';
+@import 'partials/_variables';
 @import 'partials/edit';
 @import 'partials/login';
+@import 'partials/checkbox';
+
 html {
   height: 100%;
 }
@@ -29,6 +31,7 @@ body {
   min-height: 100%;
   height: auto;
   background: $col-bg;
+  overflow-x: hidden;
 }
 
 .h1,
@@ -124,4 +127,8 @@ input {
 
 input[type="submit"].button--login {
   color: $col-pink !important;
+}
+
+.hidden {
+  display: none !important;
 }

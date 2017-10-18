@@ -65,6 +65,28 @@ $ (document).ready (() => {
     );
   });
 
+  $('#js-checkbox').append(`
+    <input type="checkbox" id="check" name="check" value="" class="checkbox" checked/>
+    <label for="check" class="label">
+      <span></span> Show only new attributes
+    </label>
+  `);
+
+  $('#check').on('change', function() {
+    if ($(this).is(':checked')) {
+      $('.edit__panel').each((index, item) => {
+        if (!$(item).hasClass('edit__panel--new')) {
+          $(item).addClass('hidden');
+        }
+      });
+    } else {
+      $('.edit__panel').each((index, item) => {
+        $(item).removeClass('hidden');
+      });
+    }
+
+  });
+
   $ ('#button-load').on ('click', () => {
     $.get ('/clone')
       .then (response => {
