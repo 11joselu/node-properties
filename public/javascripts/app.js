@@ -100,17 +100,18 @@ $ (document).ready (() => {
     .then(() => {
       numberErrors = 0;
     })
-    .catch(() => {
+    .catch((e) => {
       const $panelInfo = $('#panel__info');
       $panelInfo.empty();
       numberErrors++;
       
       if (numberErrors < 5) {
-        $panelInfo.append('<li class="edit--error--message">An error ocurred. Please try again later</li>')
+        $panelInfo.append('<li class="edit--error--message">An error ocurred. Please try again later</li>');
       } else {
         $panelInfo.append('<li class="edit--error--message">Something went wrong. Contact to the administrator</li>')
       }
 
+      $panelInfo.append(`<li class="edit--error--message">${e.response.data.message}</li>`);
       $ (this).show ();
     })
   });

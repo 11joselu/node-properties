@@ -27,7 +27,8 @@ const cleanString = (str) => {
     newStr = newStr.replace(/[\\]+/g, '\\"');
   }
 
-  return newStr.replace(/\"u/g, 'u');
+  return newStr.replace(/\"u/g, 'u')
+    .replace("\\\"'", "\\'")
 };
 
 exports.getTemplate = (req, res, next) => {
@@ -121,55 +122,65 @@ exports.generateFiles = async (req, res, next) => {
     await util.executeGitTask (req, res, output_path, command);
 
     command = `git status`;
-    await util.executeGitTask (req, res, output_path, command);
+    const {stdout} = await util.executeGitTask (req, res, output_path, command);
 
-    command = `git add .`;
-    await util.executeGitTask (req, res, output_path, command);
+    if (stdout.indexOf('nothing to commit') < 0) {
+      command = `git add .`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git commit -m "bot: add new values into properties. Date of commit ${date}"`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git remote set-url origin ${process.env.GIT_URL}`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git remote -v`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git push --set-upstream origin ${branch}`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git status`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      emitEvent (req, res, `cmd task`, `Creating a issue into repository`);
+  
+      /*const createIssue = promisify(github.issues.create, github);
+      const issue = await createIssue({
+        owner: process.env.GITHUB_OWNER,
+        repo: process.env.GITHUB_REPO_NAME,
+        title: `[Bot] - Properties Modified at ${moment().format('DD/MM/YYYY')}`,
+        body: `Properties has been modifies by node properties app\n\n **Branch:** ${branch}`,
+        labels: ['bot', 'new']
+      });
+  
+      emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);*/
+  
+      req.session.tagName = '';
+      req.session.tag = undefined;
+      req.session.master = undefined;
+  
+      command = `git checkout develop -f`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      command = `git branch -D ${branch}`;
+      await util.executeGitTask (req, res, output_path, command);
+  
+      return util.successResponse (
+        req,
+        res,
+        `Worker pushed new branch into the repository`
+      );
+    }
 
-    command = `git commit -m "bot: add new values into properties. Date of commit ${date}"`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    command = `git remote set-url origin ${process.env.GIT_URL}`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    command = `git remote -v`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    command = `git push --set-upstream origin ${branch}`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    command = `git status`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    emitEvent (req, res, `cmd task`, `Creating a issue into repository`);
-
-    /*const createIssue = promisify(github.issues.create, github);
-    const issue = await createIssue({
-      owner: process.env.GITHUB_OWNER,
-      repo: process.env.GITHUB_REPO_NAME,
-      title: `[Bot] - Properties Modified at ${moment().format('DD/MM/YYYY')}`,
-      body: `Properties has been modifies by node properties app\n\n **Branch:** ${branch}`,
-      labels: ['bot', 'new']
-    });
-
-    emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);*/
-
-    req.session.tagName = '';
-    req.session.tag = undefined;
-    req.session.master = undefined;
-
-    command = `git checkout develop -f`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    command = `git branch -D ${branch}`;
-    await util.executeGitTask (req, res, output_path, command);
-
-    util.successResponse (
+    return util.errorResponse (
       req,
       res,
-      `Worker pushed new branch into the repository`
+      `Nothing changes. So... I can't push it`,
+      {}
     );
 
+    
   } catch (e) {
     let message = `Worker found an error. Contact to the administrator`;
     
@@ -177,6 +188,6 @@ exports.generateFiles = async (req, res, next) => {
       message += `. Pass to administrator the branch name: <strong>${branch}</strong>`;
     }
 
-    util.errorResponse (req, res, message);
+    util.errorResponse (req, res, message, e);
   }
 };

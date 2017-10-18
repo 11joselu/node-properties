@@ -89,15 +89,24 @@ exports.getWorkingPath = (path, tmpFolder) => {
 exports.errorResponse = (
   req,
   res,
-  message = `Worker found an error. Contact to the administrator`
+  message = `Worker found an error. Contact to the administrator`,
+  err
 ) => {
   emitEvent (req, res, `cmd error`, message);
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log(err);
+    err.message = err.message || message;
+  } else {
+    err.message = message || 'Ops!. Something went wrong';
+  }
+
+
   res.status (500);
-  res.json ({
+  return res.json ({
     status: 500,
     data: [],
-    message: 'Ops! Something went wrong',
+    message: err.message
   });
 };
 
@@ -130,9 +139,6 @@ exports.dotenvParse =  (src) => {
       if (len > 0 && value.charAt(0) === '"' && value.charAt(len - 1) === '"') {
         value = value.replace(/\\n/gm, '\n')
       }
-
-      // remove any surrounding quotes and extra spaces
-      value = value.replace(/(^['"]|['"]$)/g, '').trim()
 
       obj[key] = value
     }

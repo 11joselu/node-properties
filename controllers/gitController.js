@@ -3,7 +3,6 @@ const util = require ('../utils/util-functions');
 const {emitEvent} = require ('../handlers/ioHandlers');
 const {mkdtempSync} = require ('fs');
 const {TMP_PREFIX} = require('../utils/constants');
-const errorTemplate = require('../views/error.marko');
 
 let tmpFolder;
 let output_path;
@@ -87,7 +86,7 @@ const cloneRepo = async(req, res, next) => {
     next ();
   } catch (e) {
     emitEvent (req, res, `cmd error`, `Error cloning...`);
-    util.errorResponse (req, res);
+    util.errorResponse (req, res, undefined, e);
   }
  
 }
@@ -140,7 +139,7 @@ exports.gitFetchTags = async (req, res, next) => {
     next ();
   } catch (e) {
     emitEvent (req, res, `cmd error`, `Error doing checkout to tag ...`);
-    util.errorResponse (req, res);
+    util.errorResponse (req, res, undefined, e);
   }
 };
 
@@ -153,7 +152,7 @@ exports.readPropertiesFiles = async (req, res, next) => {
     next ();
   } catch (e) {
     emitEvent (req, res, `cmd error`, `Error reading properties files ...`);
-    util.errorResponse (req, res);
+    util.errorResponse (req, res, undefined, e);
   }
 };
 
@@ -173,7 +172,7 @@ exports.changeToMaster = async (req, res, next) => {
     next ();
   } catch (e) {
     emitEvent (req, res, `cmd error`, `Error doing checkout to master ...`);
-    util.errorResponse (req, res);
+    util.errorResponse (req, res, undefined, e);
   }
 };
 
@@ -184,7 +183,7 @@ exports.readPropertiesFilesFromMaster = async (req, res, next) => {
     next ();
   } catch (e) {
     emitEvent (req, res, `cmd error`, `Error reading master properties files ...`);
-    util.errorResponse (req, res);
+    util.errorResponse (req, res, undefined, e);
   }
 };
 
