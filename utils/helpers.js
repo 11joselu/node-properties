@@ -32,3 +32,12 @@ exports.unescapeString = (input) => {
       return String.fromCharCode(parseInt(grp, 16)); 
   });
 };
+
+exports.getFileName = (fileName) => {
+  return fileName.split('.')
+    .filter((x) => x !== 'properties')
+    .join('')
+    .split('_')
+    .filter((x) => x !== 'openppm')
+    .join('_')
+}

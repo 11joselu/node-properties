@@ -26,5 +26,6 @@ exports.login = (req, res, next) => {
 
 exports.logout = (req, res, next) => {
   delete req.session.authenticated;
+  res.io.emit('users');
   res.redirect ('/login');
 };

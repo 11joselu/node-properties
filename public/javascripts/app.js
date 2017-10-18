@@ -10,6 +10,38 @@ import * as axios from 'axios';
 $ (document).ready (() => {
   let numberErrors = 0;
   const socket = io ();
+  const pageData = {};
+
+  const setUserValue = (num, userID) => {
+    $('#js-users').text(num)
+  
+    if (num >= 2) {
+      $('#js-users').addClass('message--error');
+      $('#js--message').text('Too much users connected, could break yours changes. ' + pageData.userID)
+        .addClass('message--error');
+      
+      if (userID === pageData.userID) {
+        hideButtons();
+      }
+  
+    } else {
+      $('#js-users').removeClass('message--error');
+      $('#js--message').text('users connected ' + pageData.userID)
+        .removeClass('message--error');
+      showButtons();
+    }
+
+  }
+  
+  const hideButtons = () => {
+    $('#button-load').hide();
+    $('#buttons').hide();
+  }
+  
+  const showButtons = () => {
+    $('#button-load').show();
+    $('#buttons').show();
+  }
 
   $ ('.panel__info').hide ();
   const $info = $ ('#panel__info');
@@ -63,6 +95,16 @@ $ (document).ready (() => {
     $info.append (
       createItem (`${msg}`, 'panel__info__item panel__info__item--error')
     );
+  });
+
+  socket.on('users', (numberUser, userID) => {
+    pageData.users = numberUser;
+
+    if (!('userID' in pageData)) {
+      pageData.userID = userID;
+    }
+
+    setUserValue(numberUser, userID);
   });
 
   $('#js-checkbox').append(`

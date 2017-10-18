@@ -7,9 +7,18 @@ $ var tagFiles = data.tagFiles;
     ${data.title} | ${out.global.h.siteName}
   </@title>
   <@header>
-   <p class="header text-right">
-      <a class="header--logout" href="/logout">Log out</a>
-    </p>
+   <div class="row">
+    <article class="large-6 columns">
+      <p class="header align--item-top text-left">
+        <span id="js-users" class="circle--budget">0</span> <span id="js--message">users Connected</span>
+      </p>
+    </article>
+    <article class="large-6 columns">
+      <p class="header text-right">
+        <a class="header--logout" href="/logout">Log out</a>
+      </p>
+    </article>
+  </div>
   </@header>
   <@body>
     <h2 class="home__title animate">Edit Properties</h2>
@@ -56,7 +65,7 @@ $ var tagFiles = data.tagFiles;
                   <else>
                     <span class="edit__panel__status edit__panel__status--new New">New</span>
                   </else>
-                  <span>${m.fileName}</span>
+                  <strong>${out.global.h.getFileName(m.fileName)}</strong>
                 </p>
                 <textarea class="edit__panel__filevalue" name="${m.fileName + '__' + key}">${out.global.h.unescapeString(m.content[key])}</textarea>
               </div>

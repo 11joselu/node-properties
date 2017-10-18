@@ -90,7 +90,7 @@ h6 {
 }
 
 .message--error {
-  background-color: $col-light-red;
+  background-color: $col-light-red !important;
   color: $panel-bg;
   border-radius: 5px;
   border: 1px solid $col-light-red;
@@ -131,4 +131,15 @@ input[type="submit"].button--login {
 
 .hidden {
   display: none !important;
+}
+
+.circle--budget {
+  width: 30px;
+  height: 30px;
+  background: $col-pink;
+  border-radius: 50%;
+  text-align: center;
+  padding: 2px;
+  color: $col-bg;
+  display: inline-block;
 }
