@@ -42,7 +42,7 @@ $ var printed = false;
       <input class="button primary edit__button" type="submit" value="Save"/>
       <for(index, key in masterKeys)>
         <if (out.global.h.findKeyIntoArrayObject(data.tagKeys, key) && !printed && index === masterKeys.length - 1)>
-          <p class="text-center" id="not-found">No new attributes found</p>
+          <p class="text-center" id="not-found">No <span class="edit__panel__status edit__panel__status--new New">new</span> attributes found</p>
           $ printed = true;
         </if>
         <section class="edit__panel row ${out.global.h.findKeyIntoArrayObject(data.tagKeys, key)? 'hidden': 'edit__panel--new'}">
