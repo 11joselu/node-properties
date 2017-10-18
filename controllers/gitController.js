@@ -11,30 +11,28 @@ let output_path;
 /**
  * Reall all files and generate array of content files
  */
-const getDataFromArrayOfFiles = async (filesDir, files, req, res) => {
+const getDataFromArrayOfFiles = (filesDir, files, req, res) => {
   const data = [];
 
   // Wait for all files
-  await Promise.all (
-    files.map (async fileName => {
-      const filePath = join (filesDir, fileName); // path of the file
-      const fileData = {fileName}; // init ouput object data
-      emitEvent (
-        req,
-        res,
-        `cmd message`,
-        `Reading file ${util.getWorkingPath (filePath, tmpFolder)}`
-      );
+  files.map (async fileName => {
+    const filePath = join (filesDir, fileName); // path of the file
+    const fileData = {fileName}; // init ouput object data
+    emitEvent (
+      req,
+      res,
+      `cmd message`,
+      `Reading file ${util.getWorkingPath (filePath, tmpFolder)}`
+    );
 
-      // load content data
-      const content = await util.getContentFromFile (filePath);
-      if (content !== null) {
-        fileData.content = content;
-        // add into array of data files
-        data.push (fileData);
-      }
-    })
-  );
+    // load content data
+    const content =  util.getContentFromFile (filePath);
+    if (content !== null) {
+      fileData.content = content;
+      // add into array of data files
+      data.push (fileData);
+    }
+  })
 
   if (data.length !== 0) {
     emitEvent (req, res, `cmd end`, '<strong>Successfully</strong> loaded');
@@ -71,7 +69,7 @@ const readPropertiesFiles = async (req, res) => {
     );
   }
 
-  return await getDataFromArrayOfFiles (filesDir, files, req, res);
+  return getDataFromArrayOfFiles (filesDir, files, req, res);
 };
 
 const cloneRepo = async(req, res, next) => {

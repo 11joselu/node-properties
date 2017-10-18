@@ -1,7 +1,6 @@
 const child_process = require ('child-process-promise');
 const exec = child_process.exec;
 const spawn = child_process.spawn;
-const dotenv = require ('dotenv');
 const fs = require ('fs');
 const promisify = require ('es6-promisify');
 const {emitEvent} = require ('../handlers/ioHandlers');
@@ -22,10 +21,8 @@ exports.executeCommand = async (command, opts = {}) => {
 /**
  * Parse properties file into Object {key: value}
  */
-exports.readPropertiesFiles = async path => {
-  const readFilePromise = promisify (fs.readFile);
-  const buf = await readFilePromise (path);
-  return dotenv.parse (buf);
+exports.readPropertiesFiles = path => {
+  return this.dotenvParse (fs.readFileSync (path, 'utf8'));
 };
 
 exports.readDir = path => {
@@ -43,9 +40,9 @@ exports.getPropertiesFromDirectory = async filesDir => {
   });
 };
 
-exports.getContentFromFile = async filePath => {
+exports.getContentFromFile = filePath => {
   if (this.isFile (filePath)) {
-    return await this.readPropertiesFiles (filePath);
+    return this.readPropertiesFiles (filePath);
   }
 
   return null;
@@ -113,3 +110,33 @@ exports.successResponse = (req, res, message, data = []) => {
     message: 'Success',
   });
 };
+
+exports.dotenvParse =  (src) => {
+  var obj = {}
+
+  // convert Buffers before splitting into lines and processing
+  src.toString().split('\n').forEach(function (line) {
+    // matching "KEY' and 'VAL' in 'KEY=VAL'
+    var keyValueArr = line.match(/^\s*([\w\.\-\%\(\)]+)\s*=\s*(.*)?\s*$/)
+    // matched?
+    if (keyValueArr != null) {
+      var key = keyValueArr[1]
+
+      // default undefined or missing values to empty string
+      var value = keyValueArr[2] || ''
+
+      // expand newlines in quoted values
+      var len = value ? value.length : 0
+      if (len > 0 && value.charAt(0) === '"' && value.charAt(len - 1) === '"') {
+        value = value.replace(/\\n/gm, '\n')
+      }
+
+      // remove any surrounding quotes and extra spaces
+      value = value.replace(/(^['"]|['"]$)/g, '').trim()
+
+      obj[key] = value
+    }
+  })
+
+  return obj
+}

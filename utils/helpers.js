@@ -20,3 +20,15 @@ exports.findKeyIntoArrayObject = (arrObj, key) => {
     return this.isInArray (o.keys, key);
   });
 };
+
+
+exports.unescapeString = (input) => {
+  if (!input) {
+    return input;
+  }
+  
+  var r = /\\u([\d\w]{4})/gi;
+  return input.replace(r, function (match, grp) {
+      return String.fromCharCode(parseInt(grp, 16)); 
+  });
+};

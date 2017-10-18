@@ -2,10 +2,13 @@ const {uniq, writeInFile} = require ('../utils/util-functions');
 const {join} = require ('path');
 const fs = require ('fs');
 const promisify = require('es6-promisify');
-const util = require ('../utils/util-functions');
-const {emitEvent} = require ('../handlers/ioHandlers');
 const moment = require ('moment');
 const Github = require ('github');
+const jsesc = require('jsesc');
+
+const util = require ('../utils/util-functions');
+const {emitEvent} = require ('../handlers/ioHandlers');
+
 const editTemplate = require('../views/edit.marko');
 
 const github = new Github ({
@@ -15,6 +18,17 @@ const github = new Github ({
   port: 8080,
   debug: process.env.NODE_ENV !== 'development'
 });
+
+const cleanString = (str) => {
+  let newStr = jsesc(str, {json: true})
+  .replace(/["]+/g, '');
+
+  if (newStr.indexOf("\\\\") >= 0) {
+    newStr = newStr.replace(/[\\]+/g, '\\"');
+  }
+
+  return newStr.replace(/\"u/g, 'u');
+};
 
 exports.getTemplate = (req, res, next) => {
   const {id} = req.params;
@@ -53,49 +67,55 @@ exports.getTemplate = (req, res, next) => {
   });
 };
 
+
 exports.generateFiles = async (req, res, next) => {
+  const properties = req.body;
+  const {id} = req.params;
+  const {tmpFolder} = req.session;
+  const output_path = join (__dirname, '..', '.tmp', tmpFolder);
+  const paths = process.env.SOURCE_PATH.split('-');
+  const filesDir = join (output_path, ...paths);
+  const filtereData = {};
+  const files = [];
+  let branch;
+
+  github.authenticate({
+    type: 'token',
+    token: process.env.USER_TOKEN,
+  });
+
+  Object.keys (properties).forEach (key => {
+    const [fileName, propertyKey] = key.split ('__');
+    if (files.indexOf (fileName) < 0) {
+      files.push (fileName);
+    }
+
+    if (!(fileName in filtereData)) {
+      filtereData[fileName] = {};
+    }
+    
+    filtereData[fileName][propertyKey] = cleanString(properties[key]);
+  });
+
   try {
-    const properties = req.body;
-    console.log(properties);
-    const {id} = req.params;
-    const {tmpFolder} = req.session;
-    const output_path = join (__dirname, '..', '.tmp', tmpFolder);
-    const filesDir = join (output_path, 'src', 'main', 'resources');
-    const filtereData = {};
-    const files = [];
-
-    github.authenticate({
-      type: 'token',
-      token: process.env.USER_TOKEN,
-    });
-
-    Object.keys (properties).forEach (key => {
-      const [fileName, propertyKey] = key.split ('__');
-      if (files.indexOf (fileName) < 0) {
-        files.push (fileName);
-      }
-
-      if (!(fileName in filtereData)) {
-        filtereData[fileName] = {};
-      }
-
-      filtereData[fileName][propertyKey] = properties[key];
-    });
 
     const filesPath = files.forEach (f => {
       const filePath = join (filesDir, f);
       const content = filtereData[f];
       const logger = fs.createWriteStream (filePath);
       Object.keys (content).forEach (value => {
-        const newContent = `${value}=${content[value]}`;
-        logger.write (`${newContent}\n`); // append string to your file
+        let fileContent = `${value}=`;
+        if (content[value]) {
+          fileContent+=content[value];
+        }
+        logger.write (`${fileContent}\n`); // append string to your file
       });
 
       logger.end ();
     });
 
     const date = moment ().format ('DD-MM-YYYY_HH_mm');
-    const branch = `bot-${date}`;
+    branch = `bot-${date}`;
     let command = `git checkout -b ${branch}`;
     emitEvent (req, res, `cmd start`, `Creating branch ${branch}`);
     await util.executeGitTask (req, res, output_path, command);
@@ -123,7 +143,7 @@ exports.generateFiles = async (req, res, next) => {
 
     emitEvent (req, res, `cmd task`, `Creating a issue into repository`);
 
-    const createIssue = promisify(github.issues.create, github);
+    /*const createIssue = promisify(github.issues.create, github);
     const issue = await createIssue({
       owner: process.env.GITHUB_OWNER,
       repo: process.env.GITHUB_REPO_NAME,
@@ -132,22 +152,31 @@ exports.generateFiles = async (req, res, next) => {
       labels: ['bot', 'new']
     });
 
-    emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);
+    emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);*/
 
     req.session.tagName = '';
     req.session.tag = undefined;
     req.session.master = undefined;
 
-    emitEvent (req, res, `cmd task`, `Removing ${tmpFolder}`);
-    await util.executeCommand (`rm -rf ${tmpFolder}`);
+    command = `git checkout develop -f`;
+    await util.executeGitTask (req, res, output_path, command);
+
+    command = `git branch -D ${branch}`;
+    await util.executeGitTask (req, res, output_path, command);
 
     util.successResponse (
       req,
       res,
       `Worker pushed new branch into the repository`
     );
-  } catch (e) {
 
-    util.errorResponse (req, res);
+  } catch (e) {
+    let message = `Worker found an error. Contact to the administrator`;
+    
+    if (branch !== undefined) {
+      message += `. Pass to administrator the branch name: <strong>${branch}</strong>`;
+    }
+
+    util.errorResponse (req, res, message);
   }
 };
