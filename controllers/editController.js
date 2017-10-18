@@ -145,7 +145,7 @@ exports.generateFiles = async (req, res, next) => {
   
       emitEvent (req, res, `cmd task`, `Creating a issue into repository`);
   
-      /*const createIssue = promisify(github.issues.create, github);
+      const createIssue = promisify(github.issues.create, github);
       const issue = await createIssue({
         owner: process.env.GITHUB_OWNER,
         repo: process.env.GITHUB_REPO_NAME,
@@ -154,7 +154,7 @@ exports.generateFiles = async (req, res, next) => {
         labels: ['bot', 'new']
       });
   
-      emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);*/
+      emitEvent (req, res, `cmd task`, `Issue create link <a href="${issue.data.html_url}">${issue.data.html_url}</a>`);
   
       req.session.tagName = '';
       req.session.tag = undefined;
